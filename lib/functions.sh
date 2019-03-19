@@ -999,13 +999,13 @@ configure_firewall(){
         if [ -z "$SSH_PORT" ] ; then SSH_PORT=22 ; fi
 
         # creates a minimal set of firewall rules that allows INBOUND masternode p2p & SSH ports */
-        # disallow everything except ssh, 8080 (webserver) and inbound ports 51738 and 51938
+        # disallow everything except ssh, 8080 (webserver) and inbound ports 51758 and 51958
         $FIREWALL_CLI default deny
         $FIREWALL_CLI logging on
         $FIREWALL_CLI allow $SSH_PORT/tcp
         $FIREWALL_CLI allow 8080/tcp comment 'partyman webserver'
-        $FIREWALL_CLI allow 51738/tcp comment 'particl p2p mainnet'
-        $FIREWALL_CLI allow 51938/tcp comment 'particl p2p testnet'
+        $FIREWALL_CLI allow 51758/tcp comment 'particl p2p mainnet'
+        $FIREWALL_CLI allow 51958/tcp comment 'particl p2p testnet'
 
         # This will only allow 6 connections every 30 seconds from the same IP address.
         $FIREWALL_CLI limit OpenSSH
@@ -1061,8 +1061,8 @@ get_particld_status(){
     PARTYD_UPTIME=`$PARTY_CLI uptime 2>/dev/null`
     if [ -z "$PARTYD_UPTIME" ] ; then PARTYD_UPTIME=0 ; fi
 
-    PARTYD_LISTENING=`netstat -nat | grep LIST | grep 51738 | wc -l`;
-    PARTYD_CONNECTIONS=`netstat -nat | grep ESTA | grep 51738 | wc -l`;
+    PARTYD_LISTENING=`netstat -nat | grep LIST | grep 51758 | wc -l`;
+    PARTYD_CONNECTIONS=`netstat -nat | grep ESTA | grep 51758 | wc -l`;
     PARTYD_CURRENT_BLOCK=`$PARTY_CLI getblockcount 2>/dev/null`
     if [ -z "$PARTYD_CURRENT_BLOCK" ] ; then PARTYD_CURRENT_BLOCK=0 ; fi
 
@@ -1099,7 +1099,7 @@ get_particld_status(){
 
     get_public_ips
 
-    PUBLIC_PORT_CLOSED=$( timeout 2 nc -4 -z $PUBLIC_IPV4 51738 2>&1 >/dev/null; echo $? )
+    PUBLIC_PORT_CLOSED=$( timeout 2 nc -4 -z $PUBLIC_IPV4 51758 2>&1 >/dev/null; echo $? )
 
     #staking info
     if [ $PARTYD_RUNNING == 1 ]; then
@@ -1225,7 +1225,7 @@ print_status() {
     if [ $PUBLIC_PORT_CLOSED  -gt 0 ]; then
        echo
        highlight "* Inbound P2P Port is not open - this is okay and will not affect the function of this staking node."
-       highlight "  However by opening port 51738/tcp you can provide full resources to the Particl Network by acting as a 'full node'."
+       highlight "  However by opening port 51758/tcp you can provide full resources to the Particl Network by acting as a 'full node'."
        highlight "  A 'full staking node' will increase the number of other nodes you connect to beyond the 16 limit."
     fi
 }
