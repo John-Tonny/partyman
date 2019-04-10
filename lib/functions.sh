@@ -297,9 +297,12 @@ _get_versions() {
         die "\n${messages["err_could_not_get_version"]} $DOWNLOAD_PAGE -- ${messages["exiting"]}"
     fi
 
-    DOWNLOAD_URL="https://github.com/particl/particl-core/releases/download/v"$LATEST_VERSION"/particl-"$LATEST_VERSION"-"$ARCH".tar.gz"
-    DOWNLOAD_FILE="particl-"$LATEST_VERSION"-"$ARCH".tar.gz"
-
+    #DOWNLOAD_URL="https://github.com/particl/particl-core/releases/download/v"$LATEST_VERSION"/particl-"$LATEST_VERSION"-"$ARCH".tar.gz"
+    #DOWNLOAD_FILE="particl-"$LATEST_VERSION"-"$ARCH".tar.gz"
+    
+    LATEST_VERSION="0.18.0.4"
+    DOWNLOAD_URL="https://github.com/John-Tonny/particl-core/releases/download/v0.18.0.4/particl-core-0.18.0.4.tar.gz"
+    DOWNLOAD_FILE="particl-core-0.18.0.4.tar.gz"
 }
 
 _check_particld_state() {
@@ -420,7 +423,7 @@ install_particld(){
     tput sc
     echo -e "$C_CYAN"
     $wget_cmd -O - $DOWNLOAD_URL | pv -trep -s27M -w80 -N wallet > $DOWNLOAD_FILE
-    $wget_cmd -O - https://raw.githubusercontent.com/particl/gitian.sigs/master/$LATEST_VERSION-linux/tecnovert/particl-linux-$LATEST_VERSION-build.assert | pv -trep -w80 -N checksums > ${DOWNLOAD_FILE}.DIGESTS.txt
+    #$wget_cmd -O - https://raw.githubusercontent.com/particl/gitian.sigs/master/$LATEST_VERSION-linux/tecnovert/particl-linux-$LATEST_VERSION-build.assert | pv -trep -w80 -N checksums > ${DOWNLOAD_FILE}.DIGESTS.txt
     echo -ne "$C_NORM"
     clear_n_lines 2
     tput rc
@@ -436,16 +439,16 @@ install_particld(){
     # prove it ---------------------------------------------------------------
 
     pending " --> ${messages["checksumming"]} ${DOWNLOAD_FILE}... "
-    SHA256SUM=$( sha256sum $DOWNLOAD_FILE )
-    SHA256PASS=$( grep $SHA256SUM ${DOWNLOAD_FILE}.DIGESTS.txt | wc -l )
-    if [ $SHA256PASS -lt 1 ] ; then
-        $wget_cmd -O - https://api.github.com/repos/particl/particl-core/releases | jq -r .[$LVCOUNTER] | jq .body > ${DOWNLOAD_FILE}.DIGESTS2.txt
-        SHA256DLPASS=$( grep $SHA256SUM ${DOWNLOAD_FILE}.DIGESTS2.txt | wc -l )
-        if [ $SHA256DLPASS -lt 1 ] ; then
-            echo -e " ${C_RED} SHA256 ${messages["checksum"]} ${messages["FAILED"]} ${messages["try_again_later"]} ${messages["exiting"]}$C_NORM"
-            exit 1
-        fi
-    fi
+    #SHA256SUM=$( sha256sum $DOWNLOAD_FILE )
+    #SHA256PASS=$( grep $SHA256SUM ${DOWNLOAD_FILE}.DIGESTS.txt | wc -l )
+    #if [ $SHA256PASS -lt 1 ] ; then
+    #    $wget_cmd -O - https://api.github.com/repos/particl/particl-core/releases | jq -r .[$LVCOUNTER] | jq .body > ${DOWNLOAD_FILE}.DIGESTS2.txt
+    #    SHA256DLPASS=$( grep $SHA256SUM ${DOWNLOAD_FILE}.DIGESTS2.txt | wc -l )
+    #    if [ $SHA256DLPASS -lt 1 ] ; then
+    #        echo -e " ${C_RED} SHA256 ${messages["checksum"]} ${messages["FAILED"]} ${messages["try_again_later"]} ${messages["exiting"]}$C_NORM"
+    #        exit 1
+    #    fi
+    #fi
     ok "${messages["done"]}"
 
     # produce it -------------------------------------------------------------
@@ -1067,12 +1070,14 @@ get_particld_status(){
     if [ -z "$PARTYD_CURRENT_BLOCK" ] ; then PARTYD_CURRENT_BLOCK=0 ; fi
 
 
-    WEB_BLOCK_COUNT_CHAINZ=$($curl_cmd https://chainz.cryptoid.info/part/api.dws?q=getblockcount 2>/dev/null | jq -r .);
+    #WEB_BLOCK_COUNT_CHAINZ=$($curl_cmd https://chainz.cryptoid.info/part/api.dws?q=getblockcount 2>/dev/null | jq -r .);
+    WEB_BLOCK_COUNT_CHAINZ=$($curl_cmd http://118.24.111.29:3001/particl-insight-api/sync 2>/dev/null | jq -r .blockChainHeight)
     if [ -z "$WEB_BLOCK_COUNT_CHAINZ" ]; then
         WEB_BLOCK_COUNT_CHAINZ=0
     fi
 
-    WEB_BLOCK_COUNT_PART=$($curl_cmd https://explorer.particl.io/particl-insight-api/sync 2>/dev/null | jq -r .blockChainHeight)
+    #WEB_BLOCK_COUNT_PART=$($curl_cmd https://explorer.particl.io/particl-insight-api/sync 2>/dev/null | jq -r .blockChainHeight)
+    WEB_BLOCK_COUNT_PART=$($curl_cmd http://118.24.111.229:3001/particl-insight-api/sync 2>/dev/null | jq -r .blockChainHeight)
     if [ -z "$WEB_BLOCK_COUNT_PART" ]; then
         WEB_BLOCK_COUNT_PART=0
     fi
